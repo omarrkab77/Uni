@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منظم جدول الدوام الجامعي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&family=Almarai:wght@400;700;800&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f1ec;--panel:#fff;--text:#1d2a33;--muted:#6b7780;--line:#ddd6c6;--field:#faf8f3;--gold:#b88c3e;--navy:#0d324a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1820;--panel:#13242f;--text:#e8edf0;--muted:#93a4ae;--line:#2a3d49;--field:#0f1e27}}
+:root[data-theme="dark"]{--bg:#0b1820;--panel:#13242f;--text:#e8edf0;--muted:#93a4ae;--line:#2a3d49;--field:#0f1e27}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Cairo',Tahoma,sans-serif;min-height:100%}
+h1.app{font-size:1.4rem;margin:0 0 4px;color:var(--text)}
+.wrap{max-width:1000px;margin:0 auto;padding:18px 14px 40px;display:grid;gap:20px;grid-template-columns:1fr}
+@media(min-width:860px){.wrap{grid-template-columns:1fr 410px;align-items:start}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.panel h2{font-size:1.05rem;margin:0 0 10px;color:var(--gold)}
+label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px;font-weight:600}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--text);font-family:inherit;font-size:.95rem}
+input:focus,select:focus{outline:2px solid var(--gold);outline-offset:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{font-family:inherit;font-weight:700;border:0;border-radius:12px;padding:11px 14px;cursor:pointer;font-size:.95rem}
+.btn.gold{background:linear-gradient(90deg,#b88c3e,#d6b265);color:#fff;width:100%;margin-top:14px}
+.btn.danger{background:transparent;border:1px solid #c0504d;color:#c0504d}
+.btn.dl{width:100%;margin-top:14px;background:linear-gradient(90deg,#0d324a,#14506f);color:#fff;border:2px solid #cba358;padding:14px;font-size:1rem}
+#list{margin-top:14px;display:grid;gap:6px;max-height:260px;overflow-y:auto}
+.item{display:flex;align-items:center;gap:8px;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:.85rem}
+.item span{flex:1}
+.item small{color:var(--muted)}
+.item button{background:#c0504d;color:#fff;border:0;border-radius:8px;width:26px;height:26px;cursor:pointer;font-size:1rem;line-height:1}
+.listhead{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.listhead .btn{padding:6px 12px;font-size:.8rem}
+.empty{color:var(--muted);font-size:.85rem;text-align:center;padding:8px}
+.preview{display:flex;flex-direction:column;align-items:center}
+.msg{font-size:.85rem;color:var(--muted);margin-top:8px;min-height:1.2em;text-align:center}
+
+/* بطاقة المعاينة - ألوان ثابتة */
+#card{width:390px;max-width:100%;background:linear-gradient(160deg,#0d324a,#071c2b);border:3px solid #cba358;border-radius:26px;padding:26px 18px 28px;direction:rtl;font-family:'Cairo',Tahoma,sans-serif}
+#card .hat{text-align:center;line-height:0}
+#card .t1{color:#fff;font-weight:900;font-size:1.7rem;text-align:center;margin:10px 0 0;line-height:1.4}
+#card .t2{color:#cba358;font-weight:700;font-size:1.15rem;text-align:center;margin:2px 0 18px}
+.day{margin-bottom:16px}
+.dayhead{background:linear-gradient(90deg,#b88c3e,#d6b265);color:#fff;text-align:center;font-weight:900;font-size:1.2rem;padding:5px 10px 8px;border-radius:12px;margin-bottom:9px;line-height:1.5}
+.lec{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:9px 10px;margin-bottom:8px}
+.time{display:flex;align-items:center;gap:5px;border:1.5px solid #cba358;border-radius:10px;padding:4px 7px;color:#8a6420;font-weight:700;font-size:.8rem;white-space:nowrap;flex:0 0 auto}
+.name{flex:1;text-align:center;color:#000;font-weight:900;font-size:.98rem;line-height:1.4}
+.name i{color:#cba358;font-style:normal;margin:0 4px;font-size:.8rem}
+.kind{color:#8a6420;font-weight:700;font-size:.8rem;flex:0 0 auto;min-width:48px;text-align:left}
+.nodata{color:#cba358;text-align:center;padding:30px 0;font-weight:600}
+#card{background:linear-gradient(160deg,var(--c1),var(--c2));border:3px solid var(--bd);border-radius:var(--rad);font-family:var(--ff),Tahoma,sans-serif;width:var(--w,390px);min-height:var(--mh,0)}
+#card .t1{color:var(--tt)}
+#card .t2{color:var(--ac)}
+.dayhead{background:linear-gradient(90deg,var(--g1),var(--g2));color:var(--dt);border-radius:var(--r2)}
+.lec{background:var(--lc);border-radius:var(--r2);box-shadow:var(--sh)}
+.time{border-color:var(--ac);color:var(--tm)}
+.name{color:var(--ln)}
+.name i{color:var(--ac)}
+.kind{color:var(--tm)}
+.nodata{color:var(--ac)}
+.themes{display:flex;flex-wrap:wrap;gap:8px}
+.sw{border:2px solid var(--line);border-radius:10px;padding:8px 12px;color:#fff;font-family:inherit;font-weight:700;cursor:pointer;text-shadow:0 1px 3px #000}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cgrid label{margin:0 0 3px;font-size:.75rem}
+input[type=color]{height:38px;padding:2px;cursor:pointer}
+input[type=file]{font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1 class="app">منظم جدول الدوام الجامعي</h1>
+    <div class="panel">
+      <h2>العناوين</h2>
+      <label for="t1">العنوان الرئيسي</label>
+      <input id="t1" value="البرنامج الأسبوعي للدوام">
+      <label for="t2">العنوان الفرعي</label>
+      <input id="t2" value="كلية طب الأسنان">
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h2>إضافة محاضرة</h2>
+      <label for="day">اليوم</label>
+      <select id="day">
+        <option>السبت</option><option>الأحد</option><option>الاثنين</option>
+        <option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option>
+      </select>
+      <div class="row">
+        <div><label for="from">وقت البداية</label><input id="from" placeholder="مثال: 8:30"></div>
+        <div><label for="to">وقت النهاية</label><input id="to" placeholder="مثال: 10:00 صباحاً"></div>
+      </div>
+      <label for="subj">اسم المادة</label>
+      <input id="subj" placeholder="مثال: تقويم 2">
+      <label for="kind">النوع / الشعبة / الفئة</label>
+      <input id="kind" placeholder="مثال: نظري، عملي، شعبة 1، فئة 3">
+      <button class="btn gold" id="add">إضافة للجدول</button>
+      <div class="listhead">
+        <strong style="font-size:.9rem">المحاضرات المضافة (<span id="cnt">0</span>)</strong>
+        <button class="btn danger" id="clear">مسح الكل</button>
+      </div>
+      <div id="list"></div>
+    </div>
+    <div class="panel" style="margin-top:14px"><h2>تخصيص التصميم</h2>
+<label>ثيمات جاهزة</label><div class="themes" id="themes"></div>
+<label>ألوان حرة</label><div class="cgrid" id="colors"></div>
+<div class="row"><div><label for="ff">الخط</label><select id="ff"><option>Cairo</option><option>Tajawal</option><option>Almarai</option><option>Reem Kufi</option></select></div>
+<div><label for="sz">مقاس الصورة</label><select id="sz"><option value="m">موبايل</option><option value="s">ستوري</option><option value="q">مربع</option><option value="w">عريض</option></select></div></div>
+<div class="row"><div><label for="rad">شكل الحواف</label><select id="rad"><option value="sharp">حادة</option><option value="mid">متوسطة</option><option value="round">دائرية</option></select></div>
+<div><label for="bl">رمز قبل المادة</label><select id="bl"><option value="✦">✦ نجمة</option><option value="★">★ نجمة ممتلئة</option><option value="●">● نقطة</option><option value="♥">♥ قلب</option><option value="◆">◆ معين</option><option value="">بدون</option></select></div></div>
+<label><input type="checkbox" id="sh" style="width:auto"> ظل على بطاقات المحاضرات</label>
+<label for="ic">الأيقونة العلوية</label><select id="ic"><option value="hat">قبعة تخرج</option><option value="book">كتاب</option><option value="tooth">سن</option><option value="txt">رمز أو إيموجي</option><option value="img">شعاري (صورة)</option><option value="none">بدون</option></select>
+<input id="icx" placeholder="اكتب إيموجي أو حرف" style="margin-top:8px"><input id="icf" type="file" accept="image/*" style="margin-top:8px">
+<button class="btn danger" id="reset" style="margin-top:14px;width:100%">إعادة التصميم الأصلي</button></div>
+  </div>
+
+  <div class="preview">
+    <div id="card"></div>
+    <button class="btn dl" id="dl">تحميل الجدول كصورة للموبايل (PNG)</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+var DAYS=['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+var lectures=[
+ {id:1,day:'السبت',from:'8:30',to:'10:00 صباحاً',subj:'تقويم 2',kind:'نظري'},
+ {id:2,day:'السبت',from:'10:30',to:'1:00 ظهراً',subj:'جراحة فموية صغرى',kind:'عملي'},
+ {id:3,day:'الاثنين',from:'9:00',to:'11:00 صباحاً',subj:'ثابتة 3',kind:'شعبة 1'},
+ {id:4,day:'الاثنين',from:'12:00',to:'2:00 ظهراً',subj:'تقويم 2',kind:'فئة 3'},
+ {id:5,day:'الأربعاء',from:'8:30',to:'10:30 صباحاً',subj:'جراحة فموية صغرى',kind:'نظري'}
+];
+var nextId=10;
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+// تحويل الوقت الحر إلى رقم للترتيب
+function toMin(s){
+  var m=String(s).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632}).match(/(\d{1,2})(?:[:.](\d{2}))?/);
+  if(!m)return 9999;
+  var h=+m[1],mi=+(m[2]||0);
+  if(/مساء|ظهر|م\b|pm/i.test(s)&&h<12)h+=12;
+  else if(h<7)h+=12; // أرقام صغيرة تعني غالباً بعد الظهر
+  return h*60+mi;
+}
+
+var hat='<svg width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M32 10 4 24l28 14 28-14L32 10Z" fill="#cba358"/><path d="M16 32v12c0 4 7 9 16 9s16-5 16-9V32l-16 8-16-8Z" fill="#b88c3e"/><path d="M58 26v16" stroke="#d6b265" stroke-width="3" stroke-linecap="round"/><circle cx="58" cy="44" r="3" fill="#d6b265"/></svg>';
+var clock='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b88c3e" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+function renderCard(){
+  var h='<div class="hat">'+iconHtml()+'</div><div class="t1">'+esc($('t1').value)+'</div><div class="t2">'+esc($('t2').value)+'</div>';
+  var any=false;
+  DAYS.forEach(function(d){
+    var ls=lectures.filter(function(l){return l.day===d}).sort(function(a,b){return toMin(a.from)-toMin(b.from)});
+    if(!ls.length)return; // إخفاء الأيام الفارغة
+    any=true;
+    h+='<div class="day"><div class="dayhead">'+d+'</div>';
+    ls.forEach(function(l){
+      var t=l.to?esc(l.from)+' – '+esc(l.to):esc(l.from);
+      h+='<div class="lec"><div class="time">'+clock.replace('#b88c3e',S.ac)+'<span>'+t+'</span></div><div class="name">'+(S.bl?'<i>'+S.bl+'</i>':'')+esc(l.subj)+'</div><div class="kind">'+esc(l.kind)+'</div></div>';
+    });
+    h+='</div>';
+  });
+  if(!any)h+='<div class="nodata">لا توجد محاضرات بعد، أضف أول محاضرة من اللوحة</div>';
+  $('card').innerHTML=h;
+}
+
+function renderList(){
+  $('cnt').textContent=lectures.length;
+  if(!lectures.length){$('list').innerHTML='<div class="empty">لا توجد محاضرات</div>';return}
+  var sorted=lectures.slice().sort(function(a,b){return DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||toMin(a.from)-toMin(b.from)});
+  $('list').innerHTML=sorted.map(function(l){
+    return '<div class="item"><span><b>'+esc(l.subj)+'</b> <small>'+l.day+' · '+esc(l.from)+(l.to?' – '+esc(l.to):'')+'</small></span><button data-id="'+l.id+'" title="حذف">×</button></div>';
+  }).join('');
+}
+function refresh(){applyStyle();renderCard();renderList();save()}
+
+$('add').onclick=function(){
+  var s=$('subj').value.trim(),f=$('from').value.trim();
+  if(!s||!f){$('msg').textContent='اكتب اسم المادة ووقت البداية على الأقل';return}
+  lectures.push({id:nextId++,day:$('day').value,from:f,to:$('to').value.trim(),subj:s,kind:$('kind').value.trim()});
+  $('subj').value='';$('kind').value='';$('msg').textContent='';
+  refresh();
+};
+$('list').onclick=function(e){
+  var id=e.target.getAttribute&&e.target.getAttribute('data-id');
+  if(!id)return;
+  lectures=lectures.filter(function(l){return l.id!=id});refresh();
+};
+$('clear').onclick=function(){
+  if(lectures.length&&confirm('هل تريد حذف كل المحاضرات؟')){lectures=[];refresh()}
+};
+$('t1').oninput=$('t2').oninput=function(){renderCard();save()};
+
+$('dl').onclick=async function(){
+  var msg=$('msg');
+  if(typeof html2canvas==='undefined'){msg.textContent='تعذر تحميل مكتبة التصوير، تأكد من الاتصال بالإنترنت';return}
+  msg.textContent='جاري تجهيز الصورة…';
+  try{
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    var canvas=await html2canvas($('card'),{scale:3,backgroundColor:null,useCORS:true});
+    var blob=await new Promise(function(r){canvas.toBlob(r,'image/png')});
+    var dls=null;
+    try{dls=window.claude&&await window.claude.use('downloads')}catch(e){}
+    if(dls){
+      await dls.save({filename:'جدول-الدوام.png',data:blob});
+    }else{
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='schedule.png';
+      document.body.appendChild(a);a.click();a.remove();
+    }
+    msg.textContent='تم تجهيز الصورة ✓';
+  }catch(err){
+    msg.textContent=(err&&err.code==='declined')?'تم إلغاء الحفظ':'حدث خطأ أثناء التحميل، حاول مرة أخرى';
+  }
+};
+var keys=['c1','c2','bd','g1','g2','ac','tt','lc','ln','dt','tm'];
+var CF=[['c1','الخلفية 1'],['c2','الخلفية 2'],['bd','الإطار'],['g1','شريط اليوم 1'],['g2','شريط اليوم 2'],['ac','اللون المميز'],['tt','العنوان'],['lc','بطاقة المحاضرة'],['ln','اسم المادة'],['dt','اسم اليوم'],['tm','الوقت والنوع']];
+var TH=[['ملكي','0d324a,071c2b,cba358,b88c3e,d6b265,cba358,ffffff,ffffff,000000,ffffff,8a6420'],['وردي','6b1f45,3d0f27,f0b6cf,c2477f,e88bb2,f4b8d2,ffffff,ffffff,3a1020,ffffff,a3295f'],['أخضر','0f4a3c,07281f,d4b86a,1f7a5c,3fa57f,d4b86a,ffffff,ffffff,062018,ffffff,1d6b50'],['أسود وفضي','1b1b1f,0a0a0c,c7ccd1,6b7078,aab0b6,c7ccd1,ffffff,f5f5f6,000000,ffffff,555b62'],['بنفسجي','3b2370,1f1240,c9b3ff,6a4bc4,9d84ec,cdbcff,ffffff,ffffff,1c1038,ffffff,5a3fb0'],['فاتح','fdf8ef,f3e7d0,b88c3e,b88c3e,d6b265,b88c3e,1d2a33,ffffff,111111,ffffff,8a6420']];
+function thv(i){var a=TH[i][1].split(','),o={};keys.forEach(function(k,j){o[k]='#'+a[j]});return o}
+function def(){return Object.assign({ff:'Cairo',rad:'round',sh:false,ic:'hat',icx:'🎓',logo:'',bl:'✦',sz:'m'},thv(0))}
+var S=def();
+function iconHtml(){
+ var a=S.ac,b=S.g1,s='<svg width="64" height="64" viewBox="0 0 64 64" ';
+ if(S.ic==='hat')return s+'fill="none"><path d="M32 10 4 24l28 14 28-14L32 10Z" fill="'+a+'"/><path d="M16 32v12c0 4 7 9 16 9s16-5 16-9V32l-16 8-16-8Z" fill="'+b+'"/><path d="M58 26v16" stroke="'+a+'" stroke-width="3" stroke-linecap="round"/><circle cx="58" cy="44" r="3" fill="'+a+'"/></svg>';
+ if(S.ic==='book')return s+'fill="none" stroke="'+a+'" stroke-width="3.5" stroke-linejoin="round"><path d="M32 14C26 10 14 10 8 13v36c6-3 18-3 24 1 6-4 18-4 24-1V13c-6-3-18-3-24 1Z"/><path d="M32 14v36"/></svg>';
+ if(S.ic==='tooth')return s+'fill="'+a+'"><path d="M20 10c-8 0-12 6-11 14 1 6 4 8 5 15 1 8 3 15 7 15 3 0 4-9 6-14 1-3 3-3 4 0 2 5 3 14 6 14 4 0 6-7 7-15 1-7 4-9 5-15 1-8-3-14-11-14-4 0-7 2-9 2s-5-2-9-2Z"/></svg>';
+ if(S.ic==='txt')return '<span style="font-size:52px;line-height:1.2;color:'+a+'">'+esc(S.icx)+'</span>';
+ if(S.ic==='img'&&S.logo)return '<img src="'+S.logo+'" style="height:64px;max-width:160px;object-fit:contain">';
+ return '';
+}
+function applyStyle(){
+ var c=$('card').style;
+ keys.forEach(function(k){c.setProperty('--'+k,S[k])});
+ c.setProperty('--ff',"'"+S.ff+"'");
+ var R={sharp:[6,4],mid:[18,10],round:[28,16]}[S.rad]||[28,16];
+ c.setProperty('--rad',R[0]+'px');c.setProperty('--r2',R[1]+'px');
+ c.setProperty('--sh',S.sh?'0 4px 12px rgba(0,0,0,.35)':'none');
+ var Z={m:[390,0],s:[390,693],q:[480,480],w:[720,0]}[S.sz]||[390,0];
+ c.setProperty('--w',Z[0]+'px');c.setProperty('--mh',Z[1]+'px');
+}
+function save(){try{localStorage.setItem('sched1',JSON.stringify({L:lectures,n:nextId,t1:$('t1').value,t2:$('t2').value,S:S}))}catch(e){}}
+function syncUI(){
+ keys.forEach(function(k){document.querySelector('[data-k="'+k+'"]').value=S[k]});
+ ['ff','rad','ic','bl','sz','icx'].forEach(function(i){$(i).value=S[i]});
+ $('sh').checked=S.sh;
+}
+$('themes').innerHTML=TH.map(function(t,i){var a=t[1].split(',');return '<button class="sw" data-i="'+i+'" style="background:linear-gradient(135deg,#'+a[0]+' 55%,#'+a[5]+' 55%)">'+t[0]+'</button>'}).join('');
+$('colors').innerHTML=CF.map(function(f){return '<div><label>'+f[1]+'</label><input type="color" data-k="'+f[0]+'"></div>'}).join('');
+$('themes').onclick=function(e){var i=e.target.getAttribute('data-i');if(i===null)return;Object.assign(S,thv(+i));syncUI();refresh()};
+$('colors').oninput=function(e){var k=e.target.getAttribute('data-k');if(!k)return;S[k]=e.target.value;refresh()};
+['ff','rad','ic','bl','sz','icx'].forEach(function(i){$(i).oninput=function(){S[i]=this.value;refresh()}});
+$('sh').onchange=function(){S.sh=this.checked;refresh()};
+$('icf').onchange=function(){
+ var f=this.files[0];if(!f)return;
+ var r=new FileReader();r.onload=function(){S.logo=r.result;S.ic='img';$('ic').value='img';refresh()};r.readAsDataURL(f);
+};
+$('reset').onclick=function(){S=def();syncUI();refresh()};
+try{var d=JSON.parse(localStorage.getItem('sched1')||'null');if(d){if(d.L)lectures=d.L;if(d.n)nextId=d.n;if(d.t1!=null)$('t1').value=d.t1;if(d.t2!=null)$('t2').value=d.t2;Object.assign(S,d.S||{})}}catch(e){}
+syncUI();
+refresh();
+</script>
+</body>
+</html>
